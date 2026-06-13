@@ -1,4 +1,14 @@
-# Mcp Server Template
+# llmstxt-mcp
+
+用于管理远程 llms.txt 文档的 MCP
+
+当前提供 5 个工具：
+
+- add：新增一个 llms.txt，抓取成功后保存配置和文档。
+- edit：按 id 修改名称、URL 或简介；URL 变更时会重新抓取文档。
+- del：按 id 删除配置和本地文档目录。
+- list：列出所有 llms 的 id、name、url、description。
+- doc_fetch：按 id 读取本地缓存的 llms.txt 内容。
 
 ## 开发
 
@@ -42,13 +52,10 @@ pnpm publish
 ```json
 {
   "mcpServers": {
-    "mcp-server-template": {
+    "llmstxt-mcp": {
       "type": "stdio",
       "command": "npx",
-      "args": ["mcp-server-template"],
-      "env": {
-        "API_KEY": "sk-123"
-      }
+      "args": ["llmstxt-mcp"]
     }
   }
 }
@@ -59,15 +66,15 @@ pnpm publish
 ### 1. Build
 
 ```bash
-docker build -t mcp-server-template .
+docker build -t llmstxt-mcp .
 ```
 
 ### 2. Run the server
 
 ```bash
-docker run -p 3000:3000 mcp-server-template
+docker run -p 3000:3000 llmstxt-mcp
 # 或启动 sse
-docker run -p 4000:4000 mcp-server-template node sse.js
+docker run -p 4000:4000 llmstxt-mcp node sse.js
 ```
 
 ### 3. MCP 配置
@@ -75,7 +82,7 @@ docker run -p 4000:4000 mcp-server-template node sse.js
 ```json
 {
   "mcpServers": {
-    "mcp-server-template": {
+    "llmstxt-mcp": {
       "type": "streamableHttp",
       "url": "http://localhost:3000/mcp",
       "headers": {
@@ -83,7 +90,7 @@ docker run -p 4000:4000 mcp-server-template node sse.js
       }
     },
     // 或 sse
-    "mcp-server-template": {
+    "llmstxt-mcp": {
       "type": "sse",
       "url": "http://localhost:4000/mcp",
       "headers": {

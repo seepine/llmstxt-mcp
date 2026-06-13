@@ -1,38 +1,127 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
-import { ctx } from '../context'
+import { llmsStore } from './llmsStore.js'
 
 export const registerTools = (server: McpServer) => {
   server.registerTool(
-    'get_weather',
+    'add',
     {
-      description: 'Get weather info for a given city.',
+      description:
+        'Add a new llms.txt (https://llmstxt.org) by URL. Fetches and caches the document locally. Use when the user wants to save, import, or subscribe to an llms.txt.',
       inputSchema: {
-        city: z.string().describe('city name'),
+        name: z.string().min(1).describe('unique llms name'),
+        url: z.url().describe('llms.txt url'),
+        description: z.string().describe('brief introduction for this llms.txt'),
       },
     },
-    async ({ city }) => {
-      if (!city) {
-        throw new Error('city name is required.')
-      }
-
-      const weather = {
-        city: city,
-        temperature: Math.floor(Math.random() * 30),
-        condition: 'Sunny',
-        headers: ctx.safeGet().data?.headers,
-      }
+    async ({ name, url, description }) => {
+      const item = await llmsStore.add({ name, url, description })
 
       return {
         content: [
           {
             type: 'text',
-            text: JSON.stringify(weather, null, 2),
+            text: JSON.stringify(item, null, 2),
           },
         ],
       }
     },
   )
 
-  // 添加更多工具注册...
+  server.registerTool(
+    'edit',
+    {
+      description:
+        "Update name, url, or description of an llms.txt entry by id. Re-fetches if url changes. Call `list` first if you don't have the id.",
+      inputSchema: {
+        id: z.uuid().describe('llms id'),
+        name: z.string().min(1).optional().describe('new unique llms name'),
+        url: z.url().optional().describe('new unique llms.txt url'),
+        description: z.string().optional().describe('new llms description'),
+      },
+    },
+    async ({ id, name, url, description }) => {
+      if (name === undefined && url === undefined && description === undefined) {
+        throw new Error('at least one field should be provided to edit')
+      }
+
+      const item = await llmsStore.edit({ id, name, url, description })
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(item, null, 2),
+          },
+        ],
+      }
+    },
+  )
+
+  server.registerTool(
+    'del',
+    {
+      description:
+        "Delete an llms.txt entry and its cached content by id. Call `list` first if you don't have the id.",
+      inputSchema: {
+        id: z.uuid().describe('llms id'),
+      },
+    },
+    async ({ id }) => {
+      const item = await llmsStore.remove(id)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(item, null, 2),
+          },
+        ],
+      }
+    },
+  )
+
+  server.registerTool(
+    'list',
+    {
+      description:
+        "List all saved llms.txt entries (id, name, url, description). Use when the user asks what's available, or to look up an id for other tools.",
+      inputSchema: {},
+    },
+    async () => {
+      const items = await llmsStore.list()
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(items, null, 2),
+          },
+        ],
+      }
+    },
+  )
+
+  server.registerTool(
+    'view_content',
+    {
+      description:
+        "Read the content of a stored llms.txt document by id. Call `list` first if you don't have the id.",
+      inputSchema: {
+        id: z.uuid().describe('llms id'),
+      },
+    },
+    async ({ id }) => {
+      const result = await llmsStore.getDoc(id)
+
+      return {
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
+      }
+    },
+  )
 }

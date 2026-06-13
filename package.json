@@ -1,9 +1,9 @@
 {
-  "name": "mcp-server-template",
+  "name": "llmstxt-mcp",
   "version": "0.1.0",
   "author": "",
   "license": "MIT",
-  "description": "Mcp Server Template",
+  "description": "MCP server for managing llms.txt documents",
   "type": "module",
   "scripts": {
     "dev": "run-p watch start:sse start:streamableHttp inspector",
@@ -36,7 +36,7 @@
     "typescript": "~5.8.2"
   },
   "bin": {
-    "mcp-server-template": "dist/stdio.js"
+    "llmstxt-mcp": "dist/stdio.js"
   },
   "files": [
     "dist"
