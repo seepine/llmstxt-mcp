@@ -9,7 +9,7 @@ import {
   type LlmsConfig,
   type LlmsItem,
 } from '../types/index.js'
-import { assertUnique, resolveDocLinks } from '../utils/index.js'
+import { assertUnique, buildProxyAgent, resolveDocLinks } from '../utils/index.js'
 
 const baseDir = join(homedir(), '.llmstxt-mcp')
 const configPath = join(baseDir, 'config.json')
@@ -89,7 +89,11 @@ const findItemIndex = (config: LlmsConfig, id: string) => {
 }
 
 const fetchDocText = async (url: string) => {
-  const response = await fetch(url)
+  const dispatcher = buildProxyAgent()
+  // `dispatcher` is an undici extension to RequestInit, not part of the
+  // standard DOM fetch type — cast around it so callers stay typed.
+  const init = dispatcher ? ({ dispatcher } as RequestInit) : undefined
+  const response = await fetch(url, init)
   if (!response.ok) {
     throw new Error(`failed to fetch document: ${response.status} ${response.statusText}`)
   }
