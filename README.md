@@ -2,13 +2,14 @@
 
 用于管理远程 llms.txt 文档的 MCP
 
-当前提供 5 个工具：
+当前提供 6 个工具：
 
 - add：新增一个 llms.txt，抓取成功后保存配置和文档。
 - edit：按 id 修改名称、URL 或简介；URL 变更时会重新抓取文档。
 - del：按 id 删除配置和本地文档目录。
 - list：列出所有 llms 的 id、name、url、description。
-- view_content：按 id 读取本地缓存的 llms.txt 内容。
+- view：按 id 读取本地缓存的 llms.txt 内容，返回的文本里包含的绝对 URL 可通过 `view_doc` 进一步获取。
+- view_doc：按绝对 URL 抓取并返回 llms.txt 中链接到的文档内容。
 
 ## 开发
 
