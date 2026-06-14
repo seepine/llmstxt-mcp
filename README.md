@@ -8,7 +8,7 @@
 - edit：按 id 修改名称、URL 或简介；URL 变更时会重新抓取文档。
 - del：按 id 删除配置和本地文档目录。
 - list：列出所有 llms 的 id、name、url、description。
-- doc_fetch：按 id 读取本地缓存的 llms.txt 内容。
+- view_content：按 id 读取本地缓存的 llms.txt 内容。
 
 ## 开发
 

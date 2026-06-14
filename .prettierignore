@@ -1,0 +1,7 @@
+dist/
+node_modules/
+
+CHANGELOG.md
+
+.dockerignore
+pnpm-lock.yaml
