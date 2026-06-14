@@ -9,7 +9,8 @@ import {
   type LlmsConfig,
   type LlmsItem,
 } from '../types/index.js'
-import { assertUnique, buildProxyAgent, resolveDocLinks } from '../utils/index.js'
+import { assertUnique, resolveDocLinks } from '../utils/index.js'
+import { fetchTextCached } from '../utils/http.js'
 
 const baseDir = join(homedir(), '.llmstxt-mcp')
 const configPath = join(baseDir, 'config.json')
@@ -88,24 +89,6 @@ const findItemIndex = (config: LlmsConfig, id: string) => {
   return index
 }
 
-const fetchDocText = async (url: string) => {
-  const dispatcher = buildProxyAgent()
-  // `dispatcher` is an undici extension to RequestInit, not part of the
-  // standard DOM fetch type — cast around it so callers stay typed.
-  const init = dispatcher ? ({ dispatcher } as RequestInit) : undefined
-  const response = await fetch(url, init)
-  if (!response.ok) {
-    throw new Error(`failed to fetch document: ${response.status} ${response.statusText}`)
-  }
-
-  const text = await response.text()
-  if (!text.trim()) {
-    throw new Error('fetched document is empty')
-  }
-
-  return text
-}
-
 /**
  * Serialize all public llmsStore operations through a single Promise chain.
  * Node's single-threaded event loop means a chained `.then` is sufficient
@@ -130,7 +113,7 @@ const withLock = <T>(fn: () => Promise<T>): Promise<T> => {
 const syncItemDocument = async (item: LlmsItem) => {
   const docPath = getDocPath(item.id)
   try {
-    const text = await fetchDocText(item.url)
+    const text = await fetchTextCached(item.url)
     await mkdir(dirname(docPath), { recursive: true })
     await writeFile(docPath, text, 'utf8')
     item.updateTime = now()
