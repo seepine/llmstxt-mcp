@@ -1,6 +1,6 @@
 {
   "name": "llmstxt-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "vitaleap",
   "license": "MIT",
   "description": "MCP server for managing llms.txt documents",
