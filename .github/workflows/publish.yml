@@ -33,10 +33,10 @@ jobs:
       - name: Install
         run: pnpm install
 
-      - name: Check Formet
-        run: pnpm format
+      - name: Check
+        run: pnpm check
 
-      - name: Check Build
+      - name: Build
         run: pnpm build
 
       - name: Authenticate with Registry
