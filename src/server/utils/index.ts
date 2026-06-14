@@ -1,6 +1,39 @@
 import { posix } from 'node:path'
 import { uniqBy } from 'es-toolkit/array'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 import type { LlmsItem } from '../types/index.js'
+
+/**
+ * Captured snapshot of proxy-related environment variables at module load.
+ * Filters out unset entries so callers can pass the result straight through
+ * to a proxy agent without checking for empty strings.
+ *
+ * Keys are normalized to lowercase (`http_proxy`, `https_proxy`, `no_proxy`)
+ * to match the conventions of `https-proxy-agent` and most CLI tooling.
+ */
+const { env } = process
+export const httpProxyEnv = Object.fromEntries(
+  Object.entries({
+    http_proxy: env.HTTP_PROXY || env.http_proxy || '',
+    https_proxy: env.HTTPS_PROXY || env.https_proxy || '',
+    no_proxy: env.NO_PROXY || env.no_proxy || '',
+  }).filter(([_k, v]) => !!v),
+)
+
+/**
+ * Build an `https-proxy-agent` dispatcher configured from the current
+ * proxy environment, or return `undefined` when no proxy is set so the
+ * caller can fall through to the platform default `fetch`.
+ *
+ * Only the proxy URL is needed — `https-proxy-agent` reads `NO_PROXY`
+ * from `process.env` on its own, so passing the full env map isn't
+ * required.
+ */
+export const buildProxyAgent = () => {
+  const proxyUrl = httpProxyEnv.https_proxy || httpProxyEnv.http_proxy
+  if (!proxyUrl) return undefined
+  return new HttpsProxyAgent(proxyUrl)
+}
 
 /**
  * Build the URL prefix used to resolve relative `.md` links found inside an

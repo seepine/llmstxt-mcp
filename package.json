@@ -25,6 +25,7 @@
     "@modelcontextprotocol/sdk": "~1.28.0",
     "es-toolkit": "^1.47.1",
     "express": "~5.2.1",
+    "https-proxy-agent": "7.0.6",
     "zod": "~4.3.6"
   },
   "devDependencies": {
