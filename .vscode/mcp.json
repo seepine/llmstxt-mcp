@@ -1,6 +1,6 @@
 {
   "servers": {
-    "weather-mcp-server-stdio": {
+    "llmstxt-mcp-stdio": {
       "type": "stdio",
       "command": "node",
       "args": [

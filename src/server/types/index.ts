@@ -15,7 +15,7 @@ export const globalSettingsSchema = z
   .optional()
 
 export const llmsConfigSchema = z.object({
-  llms: z.array(llmsItemSchema),
+  llms: z.array(llmsItemSchema).default([]),
   globalSettings: globalSettingsSchema,
 })
 

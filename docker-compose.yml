@@ -1,8 +1,8 @@
 services:
-  mcp-server-template:
+  llmstxt-mcp:
     build:
       context: .
       dockerfile: Dockerfile
-    image: mcp-server-template:latest
+    image: llmstxt-mcp:latest
     ports:
       - 3000:3000

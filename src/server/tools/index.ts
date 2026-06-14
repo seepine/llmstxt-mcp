@@ -2,6 +2,10 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js'
 import { z } from 'zod'
 import { llmsStore } from './llms-store.js'
 
+const jsonTextResult = (data: unknown) => ({
+  content: [{ type: 'text' as const, text: JSON.stringify(data) }],
+})
+
 export const registerTools = (server: McpServer) => {
   server.registerTool(
     'add',
@@ -16,15 +20,7 @@ export const registerTools = (server: McpServer) => {
     },
     async ({ name, url, description }) => {
       const item = await llmsStore.add({ name, url, description })
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(item, null, 2),
-          },
-        ],
-      }
+      return jsonTextResult(item)
     },
   )
 
@@ -46,15 +42,7 @@ export const registerTools = (server: McpServer) => {
       }
 
       const item = await llmsStore.edit({ id, name, url, description })
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(item, null, 2),
-          },
-        ],
-      }
+      return jsonTextResult(item)
     },
   )
 
@@ -69,15 +57,7 @@ export const registerTools = (server: McpServer) => {
     },
     async ({ id }) => {
       const item = await llmsStore.remove(id)
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(item, null, 2),
-          },
-        ],
-      }
+      return jsonTextResult(item)
     },
   )
 
@@ -90,15 +70,7 @@ export const registerTools = (server: McpServer) => {
     },
     async () => {
       const items = await llmsStore.list()
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(items, null, 2),
-          },
-        ],
-      }
+      return jsonTextResult(items)
     },
   )
 
@@ -113,15 +85,7 @@ export const registerTools = (server: McpServer) => {
     },
     async ({ id }) => {
       const result = await llmsStore.getDoc(id)
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: JSON.stringify(result, null, 2),
-          },
-        ],
-      }
+      return jsonTextResult(result)
     },
   )
 }
